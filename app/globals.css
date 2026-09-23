@@ -1,0 +1,181 @@
+@import 'tailwindcss';
+
+@theme inline {
+  --color-cream: #edeadc;
+  --color-forest: #1f5c33;
+  --color-forest-dark: #163f24;
+  --color-mustard: #f0b429;
+  --color-ink: #17140d;
+
+  --color-background: var(--color-cream);
+  --color-foreground: var(--color-forest);
+
+  --radius: 8px;
+}
+
+:root {
+  color-scheme: light;
+  --font-pixel: var(--font-press-start), monospace;
+  --font-mono: var(--font-space-mono), ui-monospace, monospace;
+}
+
+* {
+  border-color: var(--color-forest);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-forest);
+  font-family: var(--font-mono);
+  /* dot-grid graph-paper texture, pure CSS */
+  background-image: radial-gradient(
+    rgba(31, 92, 51, 0.18) 1px,
+    transparent 1px
+  );
+  background-size: 18px 18px;
+  background-position: -9px -9px;
+}
+
+::selection {
+  background: var(--color-mustard);
+  color: var(--color-ink);
+}
+
+@layer components {
+  /* Bordered hardware-panel box with corner screws */
+  .panel {
+    position: relative;
+    border: 2px solid var(--color-forest);
+    border-radius: var(--radius);
+    background-color: color-mix(in srgb, var(--color-cream) 82%, white);
+    box-shadow: 4px 4px 0 rgba(31, 92, 51, 0.18);
+  }
+
+  .screw {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 9999px;
+    background: var(--color-forest);
+    opacity: 0.5;
+  }
+  .screw-tl { top: 8px; left: 8px; }
+  .screw-tr { top: 8px; right: 8px; }
+  .screw-bl { bottom: 8px; left: 8px; }
+  .screw-br { bottom: 8px; right: 8px; }
+
+  /* Chunky physical push button */
+  .btn-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 2px solid var(--color-ink);
+    background-color: var(--color-mustard);
+    color: var(--color-ink);
+    font-family: var(--font-pixel);
+    font-size: 0.7rem;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    padding: 0.85rem 1.25rem;
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 var(--color-ink);
+    transition: transform 0.06s ease, box-shadow 0.06s ease;
+    cursor: pointer;
+  }
+
+  .btn-cta:hover {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 var(--color-ink);
+  }
+
+  .btn-cta:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 var(--color-ink);
+  }
+
+  .btn-cta:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 3px 3px 0 var(--color-ink);
+  }
+
+  /* Secondary / ghost button */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 2px solid var(--color-forest);
+    background-color: transparent;
+    color: var(--color-forest);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.7rem 1.1rem;
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 rgba(31, 92, 51, 0.25);
+    transition: transform 0.06s ease, box-shadow 0.06s ease;
+    cursor: pointer;
+  }
+
+  .btn-ghost:hover {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 rgba(31, 92, 51, 0.25);
+  }
+
+  /* Metadata pill / badge */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid var(--color-forest);
+    border-radius: 9999px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    background-color: color-mix(in srgb, var(--color-cream) 60%, white);
+    white-space: nowrap;
+  }
+
+  .heading {
+    font-family: var(--font-pixel);
+    text-transform: uppercase;
+    color: var(--color-forest);
+    line-height: 1.35;
+  }
+
+  .field {
+    width: 100%;
+    border: 2px solid var(--color-forest);
+    border-radius: 4px;
+    background-color: color-mix(in srgb, var(--color-cream) 70%, white);
+    color: var(--color-forest);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    padding: 0.65rem 0.8rem;
+  }
+
+  .field:focus {
+    outline: 2px solid var(--color-mustard);
+    outline-offset: 1px;
+  }
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.cursor-blink::after {
+  content: "_";
+  animation: blink 1s step-end infinite;
+}
