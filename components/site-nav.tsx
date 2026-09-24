@@ -31,7 +31,7 @@ export function SiteNav() {
           >
             About
           </Link>
-          <a href="mailto:shashwat@example.com" className="btn-cta">
+          <a href="mailto:shashwat2022@email.iimcal.ac.in" className="btn-cta">
             Contact
           </a>
         </div>

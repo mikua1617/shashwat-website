@@ -19,7 +19,7 @@ export function SiteFooter() {
               Resume
             </a>
             <a
-              href="mailto:shashwat@example.com"
+              href="mailto:shashwat2022@email.iimcal.ac.in"
               className="btn-ghost"
               aria-label="Email Shashwat Mishra"
             >
@@ -27,7 +27,7 @@ export function SiteFooter() {
               Email
             </a>
             <a
-              href="https://www.linkedin.com/in/shashwatmishra"
+              href="https://www.linkedin.com/in/shashwat-mishra-6428a1162/"
               target="_blank"
               rel="noopener noreferrer"
               className="flex h-11 w-11 items-center justify-center rounded border-2 border-forest text-forest shadow-[3px_3px_0_rgba(31,92,51,0.25)] transition-transform hover:translate-x-[1px] hover:translate-y-[1px]"
