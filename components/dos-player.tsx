@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import Script from "next/script"
-import { Play, Gamepad2, Loader2 } from "lucide-react"
+import { Play, Gamepad2 } from "lucide-react"
 
 // Real js-dos integration. js-dos v8 ships as a plain script (no npm module
 // export), so it's loaded via next/script and used through the global
@@ -10,17 +10,20 @@ import { Play, Gamepad2, Loader2 } from "lucide-react"
 // describe: https://js-dos.com/overview.html
 declare global {
   interface Window {
-    Dos?: (element: HTMLDivElement, options?: Record<string, unknown>) => {
-      run: (bundleUrl: string) => Promise<unknown>
-      stop?: () => Promise<void>
-    }
+    // v8's real signature: the bundle URL is passed IN the options object,
+    // the call is synchronous, and it returns a DosProps control object -
+    // there is no separate .run() chained call (that was v7's API).
+    Dos?: (
+      element: HTMLDivElement,
+      options?: { url?: string; autoStart?: boolean; [key: string]: unknown }
+    ) => { exit?: () => void; stop?: () => void; [key: string]: unknown }
   }
 }
 
 const BUNDLE_URL = "/games/collector.jsdos"
 
 export function DosPlayer() {
-  const [state, setState] = useState<"idle" | "booting" | "running" | "error">("idle")
+  const [state, setState] = useState<"idle" | "running" | "error">("idle")
   const [jsdosReady, setJsdosReady] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const ciRef = useRef<ReturnType<NonNullable<Window["Dos"]>> | null>(null)
@@ -28,6 +31,7 @@ export function DosPlayer() {
   useEffect(() => {
     return () => {
       // Clean up the running instance if the component unmounts mid-game
+      ciRef.current?.exit?.()
       ciRef.current?.stop?.()
     }
   }, [])
@@ -37,12 +41,19 @@ export function DosPlayer() {
       setState("error")
       return
     }
-    setState("booting")
-    const ci = window.Dos(containerRef.current, {})
-    ciRef.current = ci
-    ci.run(BUNDLE_URL)
-      .then(() => setState("running"))
-      .catch(() => setState("error"))
+    try {
+      // Reveal the container first - js-dos renders its own loading UI
+      // (from js-dos.css) inside the div while the WASM core boots, so we
+      // don't need to track internal readiness events ourselves.
+      setState("running")
+      const ci = window.Dos(containerRef.current, {
+        url: BUNDLE_URL,
+        autoStart: true,
+      })
+      ciRef.current = ci
+    } catch {
+      setState("error")
+    }
   }
 
   return (
@@ -96,19 +107,6 @@ export function DosPlayer() {
                   {jsdosReady ? "Play" : "Loading emulator..."}
                 </button>
               </>
-            )}
-
-            {state === "booting" && (
-              <div className="w-full max-w-sm text-left text-xs leading-relaxed text-mustard">
-                <p>C:\&gt; COLLEC_1.EXE</p>
-                <p className="mt-2">Loading DOSBox core...</p>
-                <p>Mounting drive C:...</p>
-                <p className="mt-2 inline-flex items-center gap-2">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-                  Booting THE COLLECTOR
-                  <span className="cursor-blink" />
-                </p>
-              </div>
             )}
 
             {state === "error" && (
