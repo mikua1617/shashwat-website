@@ -81,7 +81,10 @@ async function draftBriefing(company: string, homepageText: string): Promise<str
     body: JSON.stringify({
       model: GROQ_MODEL,
       temperature: 0.4,
-      max_tokens: 350,
+      // See note in lib/personalization.ts - gpt-oss reasons internally
+      // before answering, and that eats into this same token budget.
+      reasoning_effort: "low",
+      max_completion_tokens: 700,
       messages: [
         {
           role: "system",

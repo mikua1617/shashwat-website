@@ -133,7 +133,12 @@ async function draftMessage(
     body: JSON.stringify({
       model: GROQ_MODEL,
       temperature: 0.6,
-      max_tokens: 220,
+      // gpt-oss models reason internally before answering (tokens spent on
+      // that come out of this same budget, in a separate `reasoning`
+      // field) - reasoning_effort keeps that short, and the higher cap
+      // below leaves room for the actual message after it.
+      reasoning_effort: "low",
+      max_completion_tokens: 600,
       messages: [
         {
           role: "system",
