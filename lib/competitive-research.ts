@@ -54,12 +54,14 @@ async function crawlWebsite(homepageUrl: string): Promise<CrawledPage[]> {
 
   const endpoint = `https://api.apify.com/v2/acts/${WEBSITE_CRAWLER_ACTOR}/run-sync-get-dataset-items?token=${encodeURIComponent(
     token
-  )}&timeout=25`
+  )}&timeout=40`
 
   // Homepage only, not homepage + pricing - a real two-page playwright:adaptive
   // crawl was clocked at 40+ seconds live, which alone blew past Vercel's
   // 60s function ceiling once the LinkedIn lookup and Groq call ran after
-  // it. One page keeps this comfortably inside that budget.
+  // it. One page keeps this comfortably inside that budget. A single-page
+  // run was still clocked at ~28s live, so this timeout has to clear that
+  // with real margin, not sit right at it.
   // playwright:adaptive (not cheerio) because plenty of modern marketing
   // sites (Ramp, for one) render with JS and return nothing under cheerio.
   let res: Response
@@ -79,7 +81,7 @@ async function crawlWebsite(homepageUrl: string): Promise<CrawledPage[]> {
         // can cause fetches to quietly come back thin or empty.
         proxyConfiguration: { useApifyProxy: true },
       }),
-      signal: AbortSignal.timeout(25_000),
+      signal: AbortSignal.timeout(40_000),
     })
   } catch {
     throw new ResearchError("Couldn't reach the crawler right now. Try again.", 502)
@@ -252,8 +254,9 @@ async function draftBriefing(
         },
       ],
     }),
-    // 25s crawl + 10s LinkedIn posts + 15s here keeps the worst case at
-    // ~50s, with headroom under Vercel's 60s function ceiling.
+    // The crawl (up to 40s) and the LinkedIn lookup now run concurrently
+    // (see researchCompany), so this just needs to fit in what's left of
+    // Vercel's 60s ceiling after the crawl - 15s keeps worst case at ~55s.
     signal: AbortSignal.timeout(15_000),
   })
 
@@ -285,12 +288,19 @@ async function draftBriefing(
 export async function researchCompany(companyInput: string): Promise<string> {
   const { url, domain } = normalizeUrl(companyInput)
 
-  const [pages, linkedInCompanyUrl] = await Promise.all([
+  // The website crawl (a real browser render) is the slow part - a single
+  // homepage was clocked at ~28s live. The LinkedIn discovery+posts lookup
+  // is unrelated work, so it runs concurrently with the crawl instead of
+  // stacking after it - total wait becomes max(crawl, linkedin), not
+  // crawl + linkedin.
+  const [pages, linkedInPosts] = await Promise.all([
     crawlWebsite(url),
-    discoverLinkedInCompanyUrl(url),
+    (async () => {
+      const linkedInCompanyUrl = await discoverLinkedInCompanyUrl(url)
+      return linkedInCompanyUrl ? fetchLinkedInPosts(linkedInCompanyUrl) : []
+    })(),
   ])
 
-  const linkedInPosts = linkedInCompanyUrl ? await fetchLinkedInPosts(linkedInCompanyUrl) : []
   const changeStatus = await checkForChanges(domain, pages)
 
   return draftBriefing(domain, pages, linkedInPosts, changeStatus)
