@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Sparkles, Loader2, Lock } from "lucide-react"
+import { Sparkles, Loader2, Lock, TriangleAlert } from "lucide-react"
 import { Panel } from "./panel"
 
 type MessageType = "cold" | "connection" | "followup"
@@ -12,21 +12,7 @@ const MESSAGE_TYPES: { value: MessageType; label: string }[] = [
   { value: "followup", label: "Follow-up email" },
 ]
 
-const STAGES = ["Researching profile...", "Drafting message..."]
-
-// Placeholder generator — swap for the real /api/personalize call later.
-function draftMessage(url: string, type: MessageType): string {
-  const handle = url.split("/").filter(Boolean).pop() ?? "there"
-  const name = handle.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-  switch (type) {
-    case "cold":
-      return `Hi ${name} — noticed you're driving GTM at a fast-moving team. I build the automation layer behind outbound (research + personalization + drafting) so reps stop copy-pasting. Worth a quick look at what a 50–70% open-rate lift did for a similar team?`
-    case "connection":
-      return `Hi ${name}, we keep orbiting the same PMM + automation circles. I build AI systems for outbound personalization and I'd love to swap notes on what's actually working right now.`
-    case "followup":
-      return `Hi ${name}, circling back on my note. Short version: I built a pipeline that researches each prospect and drafts genuinely personalized outreach at scale — 30–40% lift in click rate. Happy to send a 2-minute teardown if useful.`
-  }
-}
+const STAGES = ["Scraping public profile...", "Drafting message..."]
 
 export function PersonalizationDemo() {
   const [url, setUrl] = useState("")
@@ -34,18 +20,37 @@ export function PersonalizationDemo() {
   const [loading, setLoading] = useState(false)
   const [stage, setStage] = useState("")
   const [result, setResult] = useState("")
+  const [error, setError] = useState("")
 
   async function handleGenerate() {
     if (!url.trim()) return
     setLoading(true)
     setResult("")
-    for (const s of STAGES) {
-      setStage(s)
-      await new Promise((r) => setTimeout(r, 1100))
+    setError("")
+
+    // Cosmetic staging so the (real) network round-trip doesn't feel like a
+    // silent hang - the actual work happens in the single API call below.
+    setStage(STAGES[0])
+    const stageTimer = setTimeout(() => setStage(STAGES[1]), 2500)
+
+    try {
+      const res = await fetch("/api/personalize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: url.trim(), type }),
+      })
+      const data = (await res.json()) as { draft?: string; error?: string }
+      if (!res.ok || !data.draft) {
+        throw new Error(data.error || "Something went wrong. Try again.")
+      }
+      setResult(data.draft)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Try again.")
+    } finally {
+      clearTimeout(stageTimer)
+      setStage("")
+      setLoading(false)
     }
-    setResult(draftMessage(url.trim(), type))
-    setStage("")
-    setLoading(false)
   }
 
   return (
@@ -71,6 +76,7 @@ export function PersonalizationDemo() {
             className="field"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
+            disabled={loading}
           />
         </div>
 
@@ -86,6 +92,7 @@ export function PersonalizationDemo() {
             className="field"
             value={type}
             onChange={(e) => setType(e.target.value as MessageType)}
+            disabled={loading}
           >
             {MESSAGE_TYPES.map((m) => (
               <option key={m.value} value={m.value}>
@@ -126,8 +133,14 @@ export function PersonalizationDemo() {
               {stage}
             </span>
           )}
-          {!loading && result && <p>{result}</p>}
-          {!loading && !result && (
+          {!loading && error && (
+            <span className="inline-flex items-start gap-2 text-red-700">
+              <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+              {error}
+            </span>
+          )}
+          {!loading && !error && result && <p>{result}</p>}
+          {!loading && !error && !result && (
             <span className="text-forest/50">
               {"// generated draft will appear here"}
             </span>
