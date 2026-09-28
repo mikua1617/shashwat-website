@@ -1,12 +1,23 @@
 import { NextResponse } from "next/server"
 import { personalizeForUrl, PersonalizationError, type MessageType } from "@/lib/personalization"
+import { checkAndConsumeLimit } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
 export const maxDuration = 45
 
 const VALID_TYPES: MessageType[] = ["cold", "connection", "followup"]
 
+// Personalize is the pricier demo (Apify scrape + Groq draft per run), so
+// the per-visitor cap stays tight.
+const COOKIE_LIMIT = 2
+const IP_LIMIT = 4
+
 export async function POST(req: Request) {
+  const limit = await checkAndConsumeLimit("personalize", COOKIE_LIMIT, IP_LIMIT)
+  if (!limit.allowed) {
+    return NextResponse.json({ error: limit.reason }, { status: 429 })
+  }
+
   let body: unknown
   try {
     body = await req.json()
