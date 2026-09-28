@@ -20,8 +20,9 @@ export default function HomePage() {
             <p>
               I&apos;m a product marketer who builds. Six-plus years running GTM,
               demand gen, and positioning across BFSI, enterprise IT, and AI/SaaS,
-              and instead of just writing the brief, I&apos;d usually rather build
-              the system that makes the brief unnecessary.
+              and I hold a clear line on where AI belongs in that work: it can
+              do the research, the personalization, the grunt work around a
+              campaign. The actual writing, the creative call, stays mine.
             </p>
             <p>
               That instinct started early, through a product studio stint
