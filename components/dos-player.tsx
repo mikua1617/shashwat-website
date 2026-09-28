@@ -20,7 +20,7 @@ declare global {
   }
 }
 
-const BUNDLE_URL = "/games/collector.jsdos"
+const BUNDLE_URL = "/games/collector-v2.jsdos"
 
 export function DosPlayer() {
   const [state, setState] = useState<"idle" | "running" | "error">("idle")
