@@ -151,6 +151,17 @@ body {
     text-transform: uppercase;
     color: var(--color-forest);
     line-height: 1.35;
+    /* Mustard outline around the pixel letterforms, like a highlighter
+       edge - matches the FlytBase reference (green fill, yellow stroke). */
+    text-shadow:
+      2px 0 0 var(--color-mustard),
+      -2px 0 0 var(--color-mustard),
+      0 2px 0 var(--color-mustard),
+      0 -2px 0 var(--color-mustard),
+      2px 2px 0 var(--color-mustard),
+      -2px -2px 0 var(--color-mustard),
+      2px -2px 0 var(--color-mustard),
+      -2px 2px 0 var(--color-mustard);
   }
 
   .field {
