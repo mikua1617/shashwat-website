@@ -67,6 +67,23 @@ function getClientIp(hdrs: Headers): string {
   return forwardedFor?.split(",")[0]?.trim() || hdrs.get("x-real-ip") || "unknown"
 }
 
+// Admin bypass: visiting /api/admin-unlock?token=<ADMIN_BYPASS_TOKEN> (a
+// server-only env var, never shipped to the client) sets this signed
+// cookie in the browser that visits it. Anyone with that cookie skips
+// rate limiting entirely - it's for testing from your own browser, not a
+// client-embedded secret anyone could copy out of the page source.
+export const ADMIN_BYPASS_COOKIE = "demo_admin"
+
+export function adminBypassCookieValue(): string {
+  return sign("admin-bypass-v1")
+}
+
+async function hasAdminBypass(): Promise<boolean> {
+  const cookieStore = await cookies()
+  const value = cookieStore.get(ADMIN_BYPASS_COOKIE)?.value
+  return !!value && value === adminBypassCookieValue()
+}
+
 export type LimitResult = { allowed: true } | { allowed: false; reason: string }
 
 /**
@@ -78,6 +95,8 @@ export async function checkAndConsumeLimit(
   cookieLimit: number,
   ipLimit: number
 ): Promise<LimitResult> {
+  if (await hasAdminBypass()) return { allowed: true }
+
   const hdrs = await headers()
   const ip = getClientIp(hdrs)
 
