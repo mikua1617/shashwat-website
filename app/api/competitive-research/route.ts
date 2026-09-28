@@ -5,8 +5,10 @@ import { checkAndConsumeLimit } from "@/lib/rate-limit"
 export const runtime = "nodejs"
 export const maxDuration = 30
 
+// IP_LIMIT is the real, Redis-backed cap; COOKIE_LIMIT is a same-value
+// secondary check (see lib/rate-limit.ts).
 const COOKIE_LIMIT = 2
-const IP_LIMIT = 4
+const IP_LIMIT = 2
 
 export async function POST(req: Request) {
   const limit = await checkAndConsumeLimit("competitive-research", COOKIE_LIMIT, IP_LIMIT)

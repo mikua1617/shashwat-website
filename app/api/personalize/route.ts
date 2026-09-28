@@ -8,9 +8,10 @@ export const maxDuration = 45
 const VALID_TYPES: MessageType[] = ["cold", "connection", "followup"]
 
 // Personalize is the pricier demo (Apify scrape + Groq draft per run), so
-// the per-visitor cap stays tight.
+// the per-visitor cap stays tight. IP_LIMIT is the real, Redis-backed cap;
+// COOKIE_LIMIT is a same-value secondary check (see lib/rate-limit.ts).
 const COOKIE_LIMIT = 2
-const IP_LIMIT = 4
+const IP_LIMIT = 2
 
 export async function POST(req: Request) {
   const limit = await checkAndConsumeLimit("personalize", COOKIE_LIMIT, IP_LIMIT)

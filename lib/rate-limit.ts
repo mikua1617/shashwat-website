@@ -1,19 +1,44 @@
 import { cookies, headers } from "next/headers"
 import { createHmac } from "crypto"
+import { Redis } from "@upstash/redis"
 
-// Best-effort abuse guardrail for the two paid-API demos (personalizer,
-// competitive agent). Two independent layers, neither airtight alone on
-// serverless - but together they stop casual "keep clicking the button"
-// use without needing a database:
+// Rate limiting for the two paid-API demos (personalizer, competitive
+// agent), in two layers:
 //
-// 1. A signed cookie on the visitor's browser - the primary limit, and the
-//    one that actually persists (survives cold starts). Lightly signed so
-//    editing the raw cookie value in devtools doesn't just reset it.
-// 2. An in-memory per-IP counter - a secondary net against someone clearing
-//    cookies and reloading. Only lives as long as the serverless function
-//    instance stays warm, so it's not a hard guarantee, just extra
-//    friction. Deliberately set looser than the cookie limit so it won't
-//    falsely block multiple real visitors sharing an office/NAT IP.
+// 1. Redis, keyed by IP - the real, persistent backstop. Vercel functions
+//    don't share memory between invocations or cold starts, so this is
+//    the only layer that can't be reset just by reloading the page or
+//    clearing cookies. Requires UPSTASH_REDIS_REST_URL/TOKEN; if those
+//    aren't set, this layer is skipped (see checkAndConsumeLimit) rather
+//    than breaking the demo - so it degrades gracefully before Redis is
+//    wired up, but isn't a real guarantee until it is.
+// 2. A signed cookie - a cheap secondary check on top, mainly so a normal
+//    visitor sees "you've used this" state without needing a round trip.
+//    On its own this is not the security boundary; Redis is.
+
+const redis =
+  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+    ? new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      })
+    : null
+
+const REDIS_WINDOW_SECONDS = 60 * 60 * 24 * 30 // 30 days
+
+async function checkRedisLimit(
+  ip: string,
+  scope: string,
+  limit: number
+): Promise<{ allowed: boolean; skipped: boolean }> {
+  if (!redis) return { allowed: true, skipped: true }
+  const key = `ratelimit:${scope}:${ip}`
+  const count = await redis.incr(key)
+  if (count === 1) {
+    await redis.expire(key, REDIS_WINDOW_SECONDS)
+  }
+  return { allowed: count <= limit, skipped: false }
+}
 
 const SECRET = process.env.GROQ_API_KEY ?? "portfolio-demo-fallback-secret"
 
@@ -41,33 +66,35 @@ function decodeCookie(value: string | undefined): CookieState | null {
   }
 }
 
-const ipHits = new Map<string, { count: number; firstSeen: number }>()
-const IP_WINDOW_MS = 24 * 60 * 60 * 1000
-
-function checkIpLimit(ip: string, scope: string, limit: number): boolean {
-  const key = `${scope}:${ip}`
-  const now = Date.now()
-  const entry = ipHits.get(key)
-  if (!entry || now - entry.firstSeen > IP_WINDOW_MS) {
-    ipHits.set(key, { count: 1, firstSeen: now })
-    return true
-  }
-  if (entry.count >= limit) return false
-  entry.count += 1
-  return true
+function getClientIp(hdrs: Headers): string {
+  const forwardedFor = hdrs.get("x-forwarded-for")
+  return forwardedFor?.split(",")[0]?.trim() || hdrs.get("x-real-ip") || "unknown"
 }
 
 export type LimitResult = { allowed: true } | { allowed: false; reason: string }
 
 /**
  * Call at the top of a route handler. Consumes one use if allowed. `scope`
- * namespaces the cookie/IP counters per demo (e.g. "personalize").
+ * namespaces the cookie/Redis counters per demo (e.g. "personalize").
  */
 export async function checkAndConsumeLimit(
   scope: string,
   cookieLimit: number,
   ipLimit: number
 ): Promise<LimitResult> {
+  const hdrs = await headers()
+  const ip = getClientIp(hdrs)
+
+  // Redis first - it's the real boundary. A cheap in-request short-circuit:
+  // if this IP is already over, don't even bother with the cookie dance.
+  const redisCheck = await checkRedisLimit(ip, scope, ipLimit)
+  if (!redisCheck.skipped && !redisCheck.allowed) {
+    return {
+      allowed: false,
+      reason: `This demo is capped at ${ipLimit} run${ipLimit === 1 ? "" : "s"} per visitor to keep API costs sane - thanks for trying it though.`,
+    }
+  }
+
   const cookieName = `demo_${scope}`
   const cookieStore = await cookies()
   const state = decodeCookie(cookieStore.get(cookieName)?.value) ?? { count: 0 }
@@ -76,16 +103,6 @@ export async function checkAndConsumeLimit(
     return {
       allowed: false,
       reason: `This demo is capped at ${cookieLimit} run${cookieLimit === 1 ? "" : "s"} per visitor to keep API costs sane - thanks for trying it though.`,
-    }
-  }
-
-  const hdrs = await headers()
-  const forwardedFor = hdrs.get("x-forwarded-for")
-  const ip = forwardedFor?.split(",")[0]?.trim() || hdrs.get("x-real-ip") || "unknown"
-  if (!checkIpLimit(ip, scope, ipLimit)) {
-    return {
-      allowed: false,
-      reason: "Too many requests from this network right now. Try again later.",
     }
   }
 
