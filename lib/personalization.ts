@@ -3,7 +3,9 @@
 // grounded in what was actually found - no canned templates.
 
 const LINKEDIN_URL_RE = /^https?:\/\/([a-z]{2,3}\.)?linkedin\.com\/in\/[a-zA-Z0-9\-_%.]+\/?$/i
-const GROQ_MODEL = "llama-3.3-70b-versatile"
+// See note in lib/competitive-research.ts - the 70B model 404'd on this
+// account/key, so using the universally-available 8B instant model instead.
+const GROQ_MODEL = "llama-3.1-8b-instant"
 const APIFY_ACTOR = "harvestapi~linkedin-profile-scraper"
 
 export type MessageType = "cold" | "connection" | "followup"

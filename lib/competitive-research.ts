@@ -2,7 +2,10 @@
 // client component - so no separate "server-only" package guard is needed.
 import { COMPANY_DOMAINS, isKnownCompany, type Company } from "./competitive-companies"
 
-const GROQ_MODEL = "llama-3.3-70b-versatile"
+// llama-3.3-70b-versatile 404'd as "model not found / no access" on the
+// live key despite being in Groq's docs - likely an account/tier gate.
+// llama-3.1-8b-instant is available on every Groq account with no approval.
+const GROQ_MODEL = "llama-3.1-8b-instant"
 const MAX_HOMEPAGE_CHARS = 6000
 
 class ResearchError extends Error {
