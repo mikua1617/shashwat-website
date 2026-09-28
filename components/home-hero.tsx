@@ -25,7 +25,7 @@ export function HomeHero() {
         <div className="mt-9 flex flex-wrap justify-center gap-2.5">
           <Pill icon={Target}>Product Marketing Leader</Pill>
           <Pill icon={Zap}>Builds AI systems</Pill>
-          <Pill icon={TrendingUp}>BFSI decision-intelligence</Pill>
+          <Pill icon={TrendingUp}>GTM & Growth</Pill>
         </div>
       </Panel>
     </section>
