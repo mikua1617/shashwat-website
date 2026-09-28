@@ -75,7 +75,7 @@ export function DosPlayer() {
             className="pointer-events-none absolute inset-0 opacity-20"
             style={{
               backgroundImage:
-                "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(240,180,41,0.25) 3px)",
+                "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(184,134,11,0.3) 3px)",
             }}
           />
         )}
@@ -121,7 +121,7 @@ export function DosPlayer() {
                 </p>
                 <button
                   onClick={() => setState("idle")}
-                  className="btn-ghost mt-4 border-mustard text-mustard shadow-[3px_3px_0_rgba(240,180,41,0.3)]"
+                  className="btn-ghost mt-4 border-mustard text-mustard shadow-[3px_3px_0_rgba(184,134,11,0.35)]"
                 >
                   Reset
                 </button>

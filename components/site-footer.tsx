@@ -30,7 +30,7 @@ export function SiteFooter() {
               href="https://www.linkedin.com/in/shashwat-mishra-6428a1162/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-11 w-11 items-center justify-center rounded border-2 border-forest text-forest shadow-[3px_3px_0_rgba(31,92,51,0.25)] transition-transform hover:translate-x-[1px] hover:translate-y-[1px]"
+              className="flex h-11 w-11 items-center justify-center rounded border-2 border-forest text-forest shadow-[3px_3px_0_rgba(74,53,32,0.3)] transition-transform hover:translate-x-[1px] hover:translate-y-[1px]"
               aria-label="LinkedIn profile"
             >
               <LinkedInIcon className="h-5 w-5" />

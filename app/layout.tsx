@@ -1,19 +1,19 @@
 import type { Metadata, Viewport } from "next"
-import { Press_Start_2P, JetBrains_Mono } from "next/font/google"
+import { Cinzel, EB_Garamond } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
-const pressStart = Press_Start_2P({
-  weight: "400",
+const cinzel = Cinzel({
+  weight: ["600", "700"],
   subsets: ["latin"],
-  variable: "--font-press-start",
+  variable: "--font-cinzel",
   display: "swap",
 })
 
-const jetbrainsMono = JetBrains_Mono({
-  weight: ["400", "700"],
+const garamond = EB_Garamond({
+  weight: ["400", "600", "700"],
   subsets: ["latin"],
-  variable: "--font-jetbrains-mono",
+  variable: "--font-garamond",
   display: "swap",
 })
 
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#1F5C33",
+  themeColor: "#4A3520",
   width: "device-width",
   initialScale: 1,
 }
@@ -51,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${pressStart.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${cinzel.variable} ${garamond.variable}`}>
       <body className="antialiased">
         {children}
         <Analytics />

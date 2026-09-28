@@ -17,9 +17,7 @@ export function HomeHero() {
         </h1>
 
         <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-forest/90 sm:text-lg">
-          <span className="cursor-blink">
-            Product marketer who builds the automation most PMMs only ask for
-          </span>
+          Product marketer who builds the automation most PMMs only ask for
         </p>
 
         <div className="mt-9 flex flex-wrap justify-center gap-2.5">
