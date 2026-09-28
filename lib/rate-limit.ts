@@ -8,19 +8,23 @@ import { Redis } from "@upstash/redis"
 // 1. Redis, keyed by IP - the real, persistent backstop. Vercel functions
 //    don't share memory between invocations or cold starts, so this is
 //    the only layer that can't be reset just by reloading the page or
-//    clearing cookies. Requires UPSTASH_REDIS_REST_URL/TOKEN; if those
-//    aren't set, this layer is skipped (see checkAndConsumeLimit) rather
-//    than breaking the demo - so it degrades gracefully before Redis is
-//    wired up, but isn't a real guarantee until it is.
+//    clearing cookies. Reads the env vars Vercel's own "Upstash for
+//    Redis" storage integration provisions (KV_REST_API_URL/TOKEN) -
+//    note these are NOT the UPSTASH_REDIS_REST_URL/TOKEN names Upstash's
+//    own docs show for a standalone account; Vercel's one-click
+//    integration uses the KV_ prefix instead. If neither is set, this
+//    layer is skipped (see checkAndConsumeLimit) rather than breaking
+//    the demo - so it degrades gracefully, but isn't real protection
+//    until the vars exist.
 // 2. A signed cookie - a cheap secondary check on top, mainly so a normal
 //    visitor sees "you've used this" state without needing a round trip.
 //    On its own this is not the security boundary; Redis is.
 
 const redis =
-  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+  process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN
     ? new Redis({
-        url: process.env.UPSTASH_REDIS_REST_URL,
-        token: process.env.UPSTASH_REDIS_REST_TOKEN,
+        url: process.env.KV_REST_API_URL,
+        token: process.env.KV_REST_API_TOKEN,
       })
     : null
 
