@@ -18,22 +18,22 @@ export default function HomePage() {
           <h2 className="heading text-[0.85rem] sm:text-base">// ABOUT</h2>
           <div className="mt-6 space-y-4 text-sm leading-relaxed text-forest/90 sm:text-base">
             <p>
-              I started as an engineer — Chemical Engineering at BITS Pilani,
-              then a stint writing software at a product studio. That&apos;s where I
-              learned that shipping beats theorizing.
+              I&apos;m a product marketer who builds. Six-plus years running GTM,
+              demand gen, and positioning across BFSI, enterprise IT, and AI/SaaS
+              — and instead of just writing the brief, I&apos;d usually rather build
+              the system that makes the brief unnecessary.
             </p>
             <p>
-              From there I moved into B2B services marketing, then an MBA in
-              marketing to sharpen the go-to-market side. The through-line was
-              always the same: I&apos;d rather build the thing than write a brief
-              asking someone else to build it.
+              That instinct started early — a product studio stint writing
+              software, an MBA in marketing from IIM Calcutta to sharpen the
+              go-to-market side — and it&apos;s carried through every role since:
+              shipping beats theorizing.
             </p>
             <p>
-              Today I do product marketing at a BFSI-focused AI startup, where I
-              build AI-driven marketing and product systems — personalization
-              pipelines, fine-tuned models, research agents. The positioning is
-              simple: a marketer who ships real automation and technical systems,
-              not just campaigns.
+              Today I do product marketing at a BFSI-focused AI startup, where
+              that instinct shows up as personalization pipelines, fine-tuned
+              models, and research agents. The positioning is simple: a marketer
+              who ships real automation, not just campaigns.
             </p>
           </div>
         </Panel>

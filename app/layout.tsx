@@ -20,7 +20,7 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   title: "Shashwat Mishra — Product Marketer Who Builds",
   description:
-    "Shashwat Mishra is a product marketer with an engineering background who builds the automation and technical systems most PMMs only ask for.",
+    "Shashwat Mishra is a product marketer who builds the automation and technical systems most PMMs only ask for.",
   keywords: [
     "Shashwat Mishra",
     "Product Marketing",
