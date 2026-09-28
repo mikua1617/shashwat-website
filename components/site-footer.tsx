@@ -37,10 +37,6 @@ export function SiteFooter() {
             </a>
           </div>
         </div>
-
-        <p className="mt-8 text-xs text-forest/60">
-          {"// built with next.js + typescript + tailwind — no template, just intent"}
-        </p>
       </div>
     </footer>
   )
