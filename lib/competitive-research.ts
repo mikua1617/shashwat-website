@@ -75,6 +75,10 @@ async function crawlWebsite(homepageUrl: string): Promise<CrawledPage[]> {
         maxCrawlPages: 2,
         maxRequestRetries: 1,
         removeCookieWarnings: true,
+        // The actor's input schema marks this required - omitting it isn't
+        // just a missing default, it changes how requests get routed and
+        // can cause fetches to quietly come back thin or empty.
+        proxyConfiguration: { useApifyProxy: true },
       }),
       signal: AbortSignal.timeout(60_000),
     })
@@ -87,9 +91,20 @@ async function crawlWebsite(homepageUrl: string): Promise<CrawledPage[]> {
     throw new ResearchError(`Crawl failed (${res.status}): ${body.slice(0, 200)}`, 502)
   }
 
-  const items = (await res.json()) as { url?: string; text?: string }[]
+  const items = (await res.json()) as {
+    url?: string
+    text?: string
+    crawl?: { httpStatusCode?: number }
+  }[]
   const pages = items
-    .filter((i) => i.text && i.text.trim().length > 100)
+    // A guessed path (like /pricing) that doesn't exist often 404s into a
+    // generic "not found" template full of unrelated boilerplate - drop
+    // anything that didn't actually load with a 2xx, rather than feeding
+    // that noise to the model.
+    .filter((i) => {
+      const status = i.crawl?.httpStatusCode
+      return i.text && i.text.trim().length > 100 && (status === undefined || (status >= 200 && status < 300))
+    })
     .map((i) => ({ url: i.url ?? homepageUrl, text: i.text!.slice(0, MAX_PAGE_CHARS) }))
 
   if (pages.length === 0) {
