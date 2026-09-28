@@ -19,15 +19,15 @@ export default function HomePage() {
           <div className="mt-6 space-y-4 text-sm leading-relaxed text-forest/90 sm:text-base">
             <p>
               I&apos;m a product marketer who builds. Six-plus years running GTM,
-              demand gen, and positioning across BFSI, enterprise IT, and AI/SaaS
-              — and instead of just writing the brief, I&apos;d usually rather build
+              demand gen, and positioning across BFSI, enterprise IT, and AI/SaaS,
+              and instead of just writing the brief, I&apos;d usually rather build
               the system that makes the brief unnecessary.
             </p>
             <p>
-              That instinct started early — a product studio stint writing
-              software, an MBA in marketing from IIM Calcutta to sharpen the
-              go-to-market side — and it&apos;s carried through every role since:
-              shipping beats theorizing.
+              That instinct started early, through a product studio stint
+              writing software and an MBA in marketing from IIM Calcutta to
+              sharpen the go-to-market side, and it&apos;s carried through every
+              role since: shipping beats theorizing.
             </p>
             <p>
               Today I do product marketing at a BFSI-focused AI startup, where

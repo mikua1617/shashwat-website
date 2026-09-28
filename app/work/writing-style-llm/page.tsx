@@ -4,7 +4,7 @@ import { CaseStudyShell, Section } from "@/components/case-study"
 import { Panel } from "@/components/panel"
 
 export const metadata: Metadata = {
-  title: "Writing Style LLM — Shashwat Mishra",
+  title: "Writing Style LLM - Shashwat Mishra",
   description:
     "Fine-tuned an open-weight LLM with LoRA on a personal writing corpus to reproduce voice and style.",
 }
@@ -13,7 +13,7 @@ export default function WritingStyleLlmPage() {
   return (
     <CaseStudyShell
       title="WRITING STYLE LLM"
-      intro="I fine-tuned an open-weight language model on a corpus of my own writing so it could reproduce my voice — cadence, word choice, the way I structure an argument. This is the method, the tradeoffs, and a before/after."
+      intro="I fine-tuned an open-weight language model on a corpus of my own writing so it could reproduce my voice: cadence, word choice, the way I structure an argument. This is the method, the tradeoffs, and a before/after."
       pills={[
         { label: "Applied ML", icon: BrainCircuit },
         { label: "LoRA Fine-tune", icon: SlidersHorizontal },
@@ -23,7 +23,7 @@ export default function WritingStyleLlmPage() {
       <Section title="// THE GOAL">
         <p>
           Generic models write competent, forgettable prose. I wanted a model
-          that sounded like <span className="font-bold text-forest">me</span> —
+          that sounded like <span className="font-bold text-forest">me</span>,
           useful for drafting at speed without losing voice. The task: teach an
           open-weight base model my style from my own writing.
         </p>
@@ -36,7 +36,7 @@ export default function WritingStyleLlmPage() {
             icon={<Database className="h-5 w-5" strokeWidth={2} aria-hidden="true" />}
             step="01"
             title="Dataset"
-            body="Assembled a personal corpus — essays, notes, and long-form posts — cleaned and formatted into instruction/response pairs that isolate voice from topic."
+            body="Assembled a personal corpus (essays, notes, long-form posts), cleaned and formatted into instruction/response pairs that isolate voice from topic."
           />
           <MethodCard
             icon={<SlidersHorizontal className="h-5 w-5" strokeWidth={2} aria-hidden="true" />}
@@ -48,7 +48,7 @@ export default function WritingStyleLlmPage() {
             icon={<CheckCheck className="h-5 w-5" strokeWidth={2} aria-hidden="true" />}
             step="03"
             title="Evaluation"
-            body="Blind side-by-side comparisons against the base model on held-out prompts, scoring for voice match and coherence — not just fluency."
+            body="Blind side-by-side comparisons against the base model on held-out prompts, scoring for voice match and coherence, not just fluency."
           />
         </div>
       </section>

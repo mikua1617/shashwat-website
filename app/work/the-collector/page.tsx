@@ -5,16 +5,16 @@ import { Panel } from "@/components/panel"
 import { DosPlayerEmbed } from "@/components/dos-player-embed"
 
 export const metadata: Metadata = {
-  title: "The Collector — Shashwat Mishra",
+  title: "The Collector - Shashwat Mishra",
   description:
-    "A maze game built at 15 in Borland Turbo C++, now playable in-browser via js-dos — the original compiled binary, not a rewrite.",
+    "A maze game built at 15 in Borland Turbo C++, now playable in-browser via js-dos. The original compiled binary, not a rewrite.",
 }
 
 export default function TheCollectorPage() {
   return (
     <CaseStudyShell
       title="THE COLLECTOR"
-      intro="A maze game I built at 15 in Borland Turbo C++ under the studio name Shaved Adlabs Productions. Coins, bribes, bullets, high scores — the full arcade loop. It was DOS-only for years. Now it runs in your browser."
+      intro="A maze game I built at 15 in Borland Turbo C++ under the studio name Shaved Adlabs Productions. Coins, bribes, bullets, high scores: the full arcade loop. It was DOS-only for years. Now it runs in your browser."
       pills={[
         { label: "Builder Origin", icon: Gamepad2 },
         { label: "Est. ~2010", icon: Calendar },
@@ -26,7 +26,7 @@ export default function TheCollectorPage() {
         <Panel className="p-4 sm:p-6">
           <DosPlayerEmbed />
           <p className="mt-4 text-center text-xs text-forest/70">
-            Runs the original compiled binary via js-dos emulation — not a
+            Runs the original compiled binary via js-dos emulation. Not a
             rewrite, not a remake.
           </p>
         </Panel>
@@ -67,19 +67,19 @@ export default function TheCollectorPage() {
           Rather than rebuild it in JavaScript, I kept the{" "}
           <span className="text-forest font-bold">exact original binary</span>{" "}
           and run it through js-dos, a WebAssembly build of DOSBox. What you
-          play here is the same bytes I compiled as a teenager — preserved, not
-          reinterpreted.
+          play here is the same bytes I compiled as a teenager, preserved and
+          not reinterpreted.
         </p>
       </Section>
 
       <Panel className="bg-mustard/15 p-6 sm:p-8">
         <p className="heading text-[0.8rem] leading-relaxed sm:text-sm">
-          &quot;BUILDER AT 15, BUILDER NOW — SAME INSTINCT, DIFFERENT STACK.&quot;
+          &quot;BUILDER AT 15, BUILDER NOW. SAME INSTINCT, DIFFERENT STACK.&quot;
         </p>
         <p className="mt-4 text-sm leading-relaxed text-forest/85">
           I don&apos;t write briefs and hope. I&apos;ve been shipping working
           software since before it was my job. The tools changed from Turbo C++
-          to Python and LLMs — the instinct to actually build the thing
+          to Python and LLMs. The instinct to actually build the thing
           didn&apos;t.
         </p>
       </Panel>

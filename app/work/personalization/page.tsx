@@ -5,7 +5,7 @@ import { Panel } from "@/components/panel"
 import { PersonalizationDemo } from "@/components/personalization-demo"
 
 export const metadata: Metadata = {
-  title: "Personalization Pipeline — Shashwat Mishra",
+  title: "Personalization Pipeline - Shashwat Mishra",
   description:
     "An AI-driven personalization pipeline for outbound email: research, personalize, draft. 50–70% open-rate lift, 30–40% click-rate lift.",
 }
@@ -14,7 +14,7 @@ export default function PersonalizationPage() {
   return (
     <CaseStudyShell
       title="PERSONALIZATION PIPELINE"
-      intro="I built an AI personalization pipeline for outbound email — Python, web scraping, and LLM generation stitched into one flow. It researches each prospect, personalizes the angle, and drafts the message. The numbers moved."
+      intro="I built an AI personalization pipeline for outbound email using Python, web scraping, and LLM generation stitched into one flow. It researches each prospect, personalizes the angle, and drafts the message. The numbers moved."
       pills={[
         { label: "AI Automation", icon: Bot },
         { label: "Outbound Email", icon: Mail },
@@ -35,7 +35,7 @@ export default function PersonalizationPage() {
           that reads like a human wrote it for one person.
         </p>
         <p>
-          Built in Python — scraping and enrichment feed an LLM generation step,
+          Built in Python. Scraping and enrichment feed an LLM generation step,
           with guardrails so the output stays on-voice and on-offer.
         </p>
       </Section>

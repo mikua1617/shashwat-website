@@ -12,7 +12,7 @@ export const projects: Project[] = [
   {
     slug: "the-collector",
     title: "The Collector",
-    hook: "A maze game I built at 15 in Borland Turbo C++ — still playable today, in your browser.",
+    hook: "A maze game I built at 15 in Borland Turbo C++, still playable today in your browser.",
     metric: "Est. 2010",
     category: "Builder Origin",
     tags: ["Turbo C++", "DOS", "js-dos"],
@@ -21,7 +21,7 @@ export const projects: Project[] = [
   {
     slug: "personalization",
     title: "Personalization Pipeline",
-    hook: "AI-driven outreach personalization for outbound email — research, personalize, draft.",
+    hook: "AI-driven outreach personalization for outbound email: research, personalize, draft.",
     metric: "+50–70% open rate",
     category: "AI Automation",
     tags: ["Python", "LLM", "Scraping"],

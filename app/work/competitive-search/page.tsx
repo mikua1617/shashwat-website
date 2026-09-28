@@ -4,7 +4,7 @@ import { CaseStudyShell, Section } from "@/components/case-study"
 import { CompetitiveDemo } from "@/components/competitive-demo"
 
 export const metadata: Metadata = {
-  title: "Competitive Search Agent — Shashwat Mishra",
+  title: "Competitive Search Agent - Shashwat Mishra",
   description:
     "A live AI agent that scrapes and summarizes competitor positioning in real time.",
 }
@@ -13,7 +13,7 @@ export default function CompetitiveSearchPage() {
   return (
     <CaseStudyShell
       title="COMPETITIVE SEARCH AGENT"
-      intro="A live AI agent that researches competitors in real time — it scrapes public sources, analyzes how a company positions itself, and drafts a tight briefing. Competitive intel that used to take an afternoon, in under a minute."
+      intro="A live AI agent that researches competitors in real time. It scrapes public sources, analyzes how a company positions itself, and drafts a tight briefing. Competitive intel that used to take an afternoon, now takes under a minute."
       pills={[
         { label: "AI Agent", icon: Radar },
         { label: "Real-time Research", icon: Globe },
@@ -22,7 +22,7 @@ export default function CompetitiveSearchPage() {
     >
       <Section title="// WHAT IT DOES">
         <p>
-          Competitive research is a chore that decays fast — by the time a deck
+          Competitive research is a chore that decays fast. By the time a deck
           is done, positioning has moved. I built an agent that does the loop on
           demand: gather public signal, analyze the positioning and messaging,
           and summarize it into something a PMM can actually use.

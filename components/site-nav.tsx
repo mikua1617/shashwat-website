@@ -8,7 +8,7 @@ export function SiteNav() {
         <Link
           href="/"
           className="flex items-center gap-2 text-forest"
-          aria-label="Shashwat Mishra — home"
+          aria-label="Shashwat Mishra home"
         >
           <span className="flex h-8 w-8 items-center justify-center border-2 border-forest bg-cream">
             <Terminal className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />

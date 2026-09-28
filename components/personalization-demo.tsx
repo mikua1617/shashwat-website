@@ -118,7 +118,7 @@ export function PersonalizationDemo() {
         </button>
         <span className="inline-flex items-center gap-1.5 text-xs text-forest/70">
           <Lock className="h-3.5 w-3.5" aria-hidden="true" />
-          Uses only your public LinkedIn profile info — nothing is stored.
+          Uses only your public LinkedIn profile info. Nothing is stored.
         </span>
       </div>
 
