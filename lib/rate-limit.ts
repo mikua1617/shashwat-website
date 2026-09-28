@@ -1,6 +1,6 @@
 import { cookies, headers } from "next/headers"
 import { createHmac } from "crypto"
-import { Redis } from "@upstash/redis"
+import { redis } from "./redis"
 
 // Rate limiting for the two paid-API demos (personalizer, competitive
 // agent), in two layers:
@@ -19,14 +19,6 @@ import { Redis } from "@upstash/redis"
 // 2. A signed cookie - a cheap secondary check on top, mainly so a normal
 //    visitor sees "you've used this" state without needing a round trip.
 //    On its own this is not the security boundary; Redis is.
-
-const redis =
-  process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN
-    ? new Redis({
-        url: process.env.KV_REST_API_URL,
-        token: process.env.KV_REST_API_TOKEN,
-      })
-    : null
 
 const REDIS_WINDOW_SECONDS = 60 * 60 * 24 * 30 // 30 days
 

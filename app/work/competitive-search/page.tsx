@@ -35,14 +35,23 @@ export default function CompetitiveSearchPage() {
 
       <Section title="// HOW IT WORKS">
         <p>
-          The agent chains three moves:{" "}
-          <span className="font-bold text-forest">research</span> (scrape
-          homepages, product pages, and public copy),{" "}
-          <span className="font-bold text-forest">analyze</span> (extract the
-          core message, wedge, and target segment), and{" "}
-          <span className="font-bold text-forest">draft</span> (write a concise
-          briefing with a likely soft spot). The demo below uses a fixed set of
-          example companies.
+          The agent chains four moves:{" "}
+          <span className="font-bold text-forest">crawl</span> (homepage and
+          pricing page, rendered with a real browser so JS-heavy sites still
+          work), <span className="font-bold text-forest">cross-check</span>{" "}
+          (looks for a LinkedIn company page and pulls recent posts when it
+          finds one), <span className="font-bold text-forest">watch</span>{" "}
+          (fingerprints the site&apos;s content and remembers it, so a repeat
+          check can say whether anything actually changed), and{" "}
+          <span className="font-bold text-forest">draft</span> (write a
+          concise briefing with a likely soft spot). Paste any company&apos;s
+          URL below, not a fixed list.
+        </p>
+        <p>
+          One thing that surfaced while building this: some sites embed text
+          aimed at AI agents specifically, like a fake reward for repeating a
+          phrase. The prompt is written to treat all scraped content as data
+          to analyze, never as instructions to follow.
         </p>
       </Section>
 

@@ -3,7 +3,7 @@ import { researchCompany, ResearchError } from "@/lib/competitive-research"
 import { checkAndConsumeLimit } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
-export const maxDuration = 30
+export const maxDuration = 60
 
 // IP_LIMIT is the real, Redis-backed cap; COOKIE_LIMIT is a same-value
 // secondary check (see lib/rate-limit.ts).
@@ -23,13 +23,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 })
   }
 
-  const company = (body as { company?: unknown })?.company
-  if (typeof company !== "string" || !company.trim()) {
-    return NextResponse.json({ error: "Missing company." }, { status: 400 })
+  const url = (body as { url?: unknown })?.url
+  if (typeof url !== "string" || !url.trim()) {
+    return NextResponse.json({ error: "Missing company URL." }, { status: 400 })
   }
 
   try {
-    const briefing = await researchCompany(company)
+    const briefing = await researchCompany(url)
     return NextResponse.json({ briefing })
   } catch (err) {
     if (err instanceof ResearchError) {
