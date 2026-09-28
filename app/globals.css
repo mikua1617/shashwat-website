@@ -16,7 +16,7 @@
 :root {
   color-scheme: light;
   --font-pixel: var(--font-press-start), monospace;
-  --font-mono: var(--font-space-mono), ui-monospace, monospace;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
 * {
@@ -33,11 +33,11 @@ body {
   font-family: var(--font-mono);
   /* dot-grid graph-paper texture, pure CSS */
   background-image: radial-gradient(
-    rgba(31, 92, 51, 0.18) 1px,
+    rgba(31, 92, 51, 0.22) 1px,
     transparent 1px
   );
-  background-size: 18px 18px;
-  background-position: -9px -9px;
+  background-size: 11px 11px;
+  background-position: -5.5px -5.5px;
 }
 
 ::selection {
@@ -51,7 +51,7 @@ body {
     position: relative;
     border: 2px solid var(--color-forest);
     border-radius: var(--radius);
-    background-color: color-mix(in srgb, var(--color-cream) 82%, white);
+    background-color: color-mix(in srgb, var(--color-cream) 88%, var(--color-mustard) 12%);
     box-shadow: 4px 4px 0 rgba(31, 92, 51, 0.18);
   }
 
@@ -142,7 +142,7 @@ body {
     padding: 0.3rem 0.7rem;
     font-size: 0.72rem;
     font-family: var(--font-mono);
-    background-color: color-mix(in srgb, var(--color-cream) 60%, white);
+    background-color: color-mix(in srgb, var(--color-cream) 78%, var(--color-mustard) 22%);
     white-space: nowrap;
   }
 

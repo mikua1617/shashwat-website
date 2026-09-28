@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Press_Start_2P, Space_Mono } from "next/font/google"
+import { Press_Start_2P, JetBrains_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
@@ -10,10 +10,10 @@ const pressStart = Press_Start_2P({
   display: "swap",
 })
 
-const spaceMono = Space_Mono({
+const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "700"],
   subsets: ["latin"],
-  variable: "--font-space-mono",
+  variable: "--font-jetbrains-mono",
   display: "swap",
 })
 
@@ -51,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${pressStart.variable} ${spaceMono.variable}`}>
+    <html lang="en" className={`${pressStart.variable} ${jetbrainsMono.variable}`}>
       <body className="antialiased">
         {children}
         <Analytics />
