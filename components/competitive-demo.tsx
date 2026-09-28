@@ -5,7 +5,7 @@ import { Radar, Loader2, TriangleAlert } from "lucide-react"
 import { Panel } from "./panel"
 
 const STAGES = [
-  "Crawling homepage...",
+  "Fetching homepage...",
   "Checking for a LinkedIn company page...",
   "Comparing against last check...",
   "Drafting briefing...",
@@ -24,15 +24,15 @@ export function CompetitiveDemo() {
     setResult("")
     setError("")
 
-    // Cosmetic staging so the real, multi-step pipeline (crawl, LinkedIn
+    // Cosmetic staging so the real, multi-step pipeline (fetch, LinkedIn
     // lookup, change-detection, LLM) doesn't feel like a silent hang - the
-    // whole thing typically takes 30-45s.
+    // whole thing typically takes 10-20s.
     let stageIndex = 0
     setStage(STAGES[0])
     const stageTimer = setInterval(() => {
       stageIndex = Math.min(stageIndex + 1, STAGES.length - 1)
       setStage(STAGES[stageIndex])
-    }, 9000)
+    }, 4000)
 
     try {
       const res = await fetch("/api/competitive-research", {
@@ -70,10 +70,10 @@ export function CompetitiveDemo() {
     <Panel className="p-6 sm:p-8">
       <h2 className="heading text-[0.85rem] sm:text-base">// RUN THE AGENT</h2>
       <p className="mt-4 text-sm leading-relaxed text-forest/85">
-        Paste any company&apos;s URL. The agent crawls their homepage, looks
+        Paste any company&apos;s URL. The agent fetches their homepage, looks
         for recent LinkedIn activity, checks whether it has seen this site
         before, and drafts a positioning briefing from it. Takes about
-        20-30 seconds.
+        10-20 seconds.
       </p>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-[2fr_1fr] sm:items-end">

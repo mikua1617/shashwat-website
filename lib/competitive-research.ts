@@ -8,7 +8,6 @@ import { redis } from "./redis"
 // model - that's why both 404'd as "not found / no access". gpt-oss-120b
 // is the largest general-purpose model actually on the allow-list.
 const GROQ_MODEL = "openai/gpt-oss-120b"
-const WEBSITE_CRAWLER_ACTOR = "apify~website-content-crawler"
 const LINKEDIN_POSTS_ACTOR = "harvestapi~linkedin-company-posts"
 const MAX_PAGE_CHARS = 5000
 const MAX_TOTAL_CHARS = 9000
@@ -46,98 +45,81 @@ function normalizeUrl(input: string): { url: string; domain: string } {
 
 type CrawledPage = { url: string; text: string }
 
-async function crawlWebsite(homepageUrl: string): Promise<CrawledPage[]> {
-  const token = process.env.APIFY_TOKEN
-  if (!token) {
-    throw new ResearchError("Research agent isn't configured yet (missing APIFY_TOKEN).", 500)
-  }
-
-  const endpoint = `https://api.apify.com/v2/acts/${WEBSITE_CRAWLER_ACTOR}/run-sync-get-dataset-items?token=${encodeURIComponent(
-    token
-  )}&timeout=40`
-
-  // Homepage only, not homepage + pricing - a real two-page playwright:adaptive
-  // crawl was clocked at 40+ seconds live, which alone blew past Vercel's
-  // 60s function ceiling once the LinkedIn lookup and Groq call ran after
-  // it. One page keeps this comfortably inside that budget. A single-page
-  // run was still clocked at ~28s live, so this timeout has to clear that
-  // with real margin, not sit right at it.
-  // playwright:adaptive (not cheerio) because plenty of modern marketing
-  // sites (Ramp, for one) render with JS and return nothing under cheerio.
-  let res: Response
-  try {
-    res = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        startUrls: [{ url: homepageUrl }],
-        crawlerType: "playwright:adaptive",
-        maxCrawlDepth: 0,
-        maxCrawlPages: 1,
-        maxRequestRetries: 1,
-        removeCookieWarnings: true,
-        // The actor's input schema marks this required - omitting it isn't
-        // just a missing default, it changes how requests get routed and
-        // can cause fetches to quietly come back thin or empty.
-        proxyConfiguration: { useApifyProxy: true },
-      }),
-      signal: AbortSignal.timeout(40_000),
-    })
-  } catch {
-    throw new ResearchError("Couldn't reach the crawler right now. Try again.", 502)
-  }
-
-  if (!res.ok) {
-    const body = await res.text().catch(() => "")
-    throw new ResearchError(`Crawl failed (${res.status}): ${body.slice(0, 200)}`, 502)
-  }
-
-  const items = (await res.json()) as {
-    url?: string
-    text?: string
-    crawl?: { httpStatusCode?: number }
-  }[]
-  const pages = items
-    // A guessed path (like /pricing) that doesn't exist often 404s into a
-    // generic "not found" template full of unrelated boilerplate - drop
-    // anything that didn't actually load with a 2xx, rather than feeding
-    // that noise to the model.
-    .filter((i) => {
-      const status = i.crawl?.httpStatusCode
-      return i.text && i.text.trim().length > 100 && (status === undefined || (status >= 200 && status < 300))
-    })
-    .map((i) => ({ url: i.url ?? homepageUrl, text: i.text!.slice(0, MAX_PAGE_CHARS) }))
-
-  if (pages.length === 0) {
-    throw new ResearchError(
-      "Couldn't find enough readable content on that site. Double-check the URL.",
-      502
-    )
-  }
-
-  return pages
+// Strips a raw HTML document down to readable body text. Deliberately crude -
+// this only needs to give the model enough signal to summarize positioning,
+// not to render the page.
+function extractVisibleText(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&[a-z]+;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim()
 }
 
-// Best-effort: look for a linkedin.com/company/... link in the homepage's
-// raw HTML. Skips gracefully (returns null) on any failure - this is a
-// bonus signal, not a required one.
-async function discoverLinkedInCompanyUrl(homepageUrl: string): Promise<string | null> {
+function extractMetaContent(html: string, name: string): string | null {
+  const re = new RegExp(
+    `<meta[^>]+(?:name|property)=["']${name}["'][^>]+content=["']([^"']*)["']`,
+    "i"
+  )
+  return html.match(re)?.[1] ?? null
+}
+
+// A plain fetch, not a headless-browser scrape - no Apify actor, no
+// per-run cost, and it's fast (typically under 2s vs. 30-40s for a real
+// browser render). Trade-off: a fully client-rendered SPA can come back
+// thin on body text, so meta description / og:description (usually
+// present in the raw HTML even then) get pulled in as a backstop signal.
+// Also does double duty finding a linkedin.com/company/... link on the
+// same page, so there's no second fetch needed for that.
+async function fetchHomepage(
+  homepageUrl: string
+): Promise<{ page: CrawledPage; linkedInUrl: string | null }> {
+  let res: Response
   try {
-    const res = await fetch(homepageUrl, {
+    res = await fetch(homepageUrl, {
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
       },
       redirect: "follow",
-      signal: AbortSignal.timeout(8_000),
+      signal: AbortSignal.timeout(10_000),
     })
-    if (!res.ok) return null
-    const html = await res.text()
-    const match = html.match(/https?:\/\/(?:[a-z]{2,3}\.)?linkedin\.com\/company\/[a-zA-Z0-9\-_%]+/i)
-    return match ? match[0].split("?")[0] : null
   } catch {
-    return null
+    throw new ResearchError(`Couldn't reach ${homepageUrl} right now. Try again.`, 502)
   }
+
+  if (!res.ok) {
+    throw new ResearchError(`${homepageUrl} responded with ${res.status}. Try again.`, 502)
+  }
+
+  const html = await res.text()
+
+  const linkedInMatch = html.match(
+    /https?:\/\/(?:[a-z]{2,3}\.)?linkedin\.com\/company\/[a-zA-Z0-9\-_%]+/i
+  )
+  const linkedInUrl = linkedInMatch ? linkedInMatch[0].split("?")[0] : null
+
+  const description = extractMetaContent(html, "description") || extractMetaContent(html, "og:description")
+  const bodyText = extractVisibleText(html)
+
+  if (bodyText.length < 80 && !description) {
+    throw new ResearchError(
+      "Got a response from that site but couldn't find enough readable content on it - it may render entirely client-side.",
+      502
+    )
+  }
+
+  const text = [description ? `Meta description: ${description}` : "", bodyText]
+    .filter(Boolean)
+    .join("\n\n")
+    .slice(0, MAX_PAGE_CHARS)
+
+  return { page: { url: homepageUrl, text }, linkedInUrl }
 }
 
 type LinkedInPost = { content?: string; text?: string }
@@ -288,22 +270,11 @@ async function draftBriefing(
 export async function researchCompany(companyInput: string): Promise<string> {
   const { url, domain } = normalizeUrl(companyInput)
 
-  // The website crawl (a real browser render) is the slow part - a single
-  // homepage was clocked at ~28s live. The LinkedIn discovery+posts lookup
-  // is unrelated work, so it runs concurrently with the crawl instead of
-  // stacking after it - total wait becomes max(crawl, linkedin), not
-  // crawl + linkedin.
-  const [pages, linkedInPosts] = await Promise.all([
-    crawlWebsite(url),
-    (async () => {
-      const linkedInCompanyUrl = await discoverLinkedInCompanyUrl(url)
-      return linkedInCompanyUrl ? fetchLinkedInPosts(linkedInCompanyUrl) : []
-    })(),
-  ])
+  const { page, linkedInUrl } = await fetchHomepage(url)
+  const linkedInPosts = linkedInUrl ? await fetchLinkedInPosts(linkedInUrl) : []
+  const changeStatus = await checkForChanges(domain, [page])
 
-  const changeStatus = await checkForChanges(domain, pages)
-
-  return draftBriefing(domain, pages, linkedInPosts, changeStatus)
+  return draftBriefing(domain, [page], linkedInPosts, changeStatus)
 }
 
 export { ResearchError }
