@@ -9,7 +9,7 @@ export function SiteFooter() {
           <div>
             <p className="heading text-[0.7rem]">SHASHWAT MISHRA</p>
             <p className="mt-2 text-sm text-forest/80">
-              Product marketer who builds. Let&apos;s talk.
+              Product marketer who builds. Let&apos;s talk!
             </p>
           </div>
 
