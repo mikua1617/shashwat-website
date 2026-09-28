@@ -5,7 +5,7 @@ import { Radar, Loader2, TriangleAlert } from "lucide-react"
 import { Panel } from "./panel"
 
 const STAGES = [
-  "Crawling site (homepage + pricing)...",
+  "Crawling homepage...",
   "Checking for a LinkedIn company page...",
   "Comparing against last check...",
   "Drafting briefing...",
@@ -40,7 +40,19 @@ export function CompetitiveDemo() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: url.trim() }),
       })
-      const data = (await res.json()) as { briefing?: string; error?: string }
+      let data: { briefing?: string; error?: string } = {}
+      try {
+        data = await res.json()
+      } catch {
+        // A platform-level failure (like a function timeout) returns an
+        // HTML/plain-text error page, not JSON - don't let that crash the
+        // UI with a raw parse error.
+        throw new Error(
+          res.status === 504 || res.status === 502
+            ? "That took too long and timed out. Try again - it's sometimes just a slow site."
+            : "Something went wrong. Try again."
+        )
+      }
       if (!res.ok || !data.briefing) {
         throw new Error(data.error || "Something went wrong. Try again.")
       }
@@ -58,9 +70,10 @@ export function CompetitiveDemo() {
     <Panel className="p-6 sm:p-8">
       <h2 className="heading text-[0.85rem] sm:text-base">// RUN THE AGENT</h2>
       <p className="mt-4 text-sm leading-relaxed text-forest/85">
-        Paste any company&apos;s URL. The agent crawls their site, looks for
-        recent LinkedIn activity, checks whether it has seen this site before,
-        and drafts a positioning briefing from it. Takes about 30-45 seconds.
+        Paste any company&apos;s URL. The agent crawls their homepage, looks
+        for recent LinkedIn activity, checks whether it has seen this site
+        before, and drafts a positioning briefing from it. Takes about
+        20-30 seconds.
       </p>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-[2fr_1fr] sm:items-end">

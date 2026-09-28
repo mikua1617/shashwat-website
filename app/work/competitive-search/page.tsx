@@ -36,8 +36,8 @@ export default function CompetitiveSearchPage() {
       <Section title="// HOW IT WORKS">
         <p>
           The agent chains four moves:{" "}
-          <span className="font-bold text-forest">crawl</span> (homepage and
-          pricing page, rendered with a real browser so JS-heavy sites still
+          <span className="font-bold text-forest">crawl</span> (their
+          homepage, rendered with a real browser so JS-heavy sites still
           work), <span className="font-bold text-forest">cross-check</span>{" "}
           (looks for a LinkedIn company page and pulls recent posts when it
           finds one), <span className="font-bold text-forest">watch</span>{" "}

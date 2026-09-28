@@ -54,25 +54,24 @@ async function crawlWebsite(homepageUrl: string): Promise<CrawledPage[]> {
 
   const endpoint = `https://api.apify.com/v2/acts/${WEBSITE_CRAWLER_ACTOR}/run-sync-get-dataset-items?token=${encodeURIComponent(
     token
-  )}&timeout=60`
+  )}&timeout=25`
 
-  // Explicit start URLs rather than glob-based link-following - faster,
-  // deterministic, and avoids the crawler wandering into unrelated pages.
-  // playwright:adaptive because plenty of modern marketing sites (Ramp,
-  // for one) render with JS and return nothing under cheerio.
+  // Homepage only, not homepage + pricing - a real two-page playwright:adaptive
+  // crawl was clocked at 40+ seconds live, which alone blew past Vercel's
+  // 60s function ceiling once the LinkedIn lookup and Groq call ran after
+  // it. One page keeps this comfortably inside that budget.
+  // playwright:adaptive (not cheerio) because plenty of modern marketing
+  // sites (Ramp, for one) render with JS and return nothing under cheerio.
   let res: Response
   try {
     res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        startUrls: [
-          { url: homepageUrl },
-          { url: `${homepageUrl}/pricing` },
-        ],
+        startUrls: [{ url: homepageUrl }],
         crawlerType: "playwright:adaptive",
         maxCrawlDepth: 0,
-        maxCrawlPages: 2,
+        maxCrawlPages: 1,
         maxRequestRetries: 1,
         removeCookieWarnings: true,
         // The actor's input schema marks this required - omitting it isn't
@@ -80,7 +79,7 @@ async function crawlWebsite(homepageUrl: string): Promise<CrawledPage[]> {
         // can cause fetches to quietly come back thin or empty.
         proxyConfiguration: { useApifyProxy: true },
       }),
-      signal: AbortSignal.timeout(60_000),
+      signal: AbortSignal.timeout(25_000),
     })
   } catch {
     throw new ResearchError("Couldn't reach the crawler right now. Try again.", 502)
@@ -147,14 +146,17 @@ async function fetchLinkedInPosts(companyUrl: string): Promise<string[]> {
 
   const endpoint = `https://api.apify.com/v2/acts/${LINKEDIN_POSTS_ACTOR}/run-sync-get-dataset-items?token=${encodeURIComponent(
     token
-  )}&timeout=45`
+  )}&timeout=10`
 
+  // Bonus signal, not a required one - cap it well under the remaining
+  // request budget so a slow LinkedIn fetch can't itself cause the whole
+  // request to time out.
   try {
     const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ targetUrls: [companyUrl], maxPosts: 5 }),
-      signal: AbortSignal.timeout(45_000),
+      signal: AbortSignal.timeout(10_000),
     })
     if (!res.ok) return []
     const items = (await res.json()) as LinkedInPost[]
@@ -250,7 +252,9 @@ async function draftBriefing(
         },
       ],
     }),
-    signal: AbortSignal.timeout(20_000),
+    // 25s crawl + 10s LinkedIn posts + 15s here keeps the worst case at
+    // ~50s, with headroom under Vercel's 60s function ceiling.
+    signal: AbortSignal.timeout(15_000),
   })
 
   if (!res.ok) {

@@ -39,7 +39,19 @@ export function PersonalizationDemo() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: url.trim(), type }),
       })
-      const data = (await res.json()) as { draft?: string; error?: string }
+      let data: { draft?: string; error?: string } = {}
+      try {
+        data = await res.json()
+      } catch {
+        // A platform-level failure (like a function timeout) returns an
+        // HTML/plain-text error page, not JSON - don't let that crash the
+        // UI with a raw parse error.
+        throw new Error(
+          res.status === 504 || res.status === 502
+            ? "That took too long and timed out. Try again."
+            : "Something went wrong. Try again."
+        )
+      }
       if (!res.ok || !data.draft) {
         throw new Error(data.error || "Something went wrong. Try again.")
       }
