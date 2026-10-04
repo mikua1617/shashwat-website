@@ -47,6 +47,10 @@ button,input,select,textarea{font:inherit;color:inherit}
 .stat b{font-family:var(--f-display);font-size:22px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
 .stat span{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .stat.ovr b{color:var(--t-override)}
+.stats{gap:18px}
+.sgrp{display:flex;flex-direction:column;gap:2px}
+.sgl{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);padding-left:10px;font-weight:500}
+.sgr{display:flex;gap:4px;flex-wrap:wrap}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
 .seg button{border:0;background:transparent;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:500}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
@@ -259,7 +263,7 @@ td.n{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);white-space:n
   .duo{grid-template-columns:1fr}
 }
 @media (max-width:640px){
-  .stats .stat:nth-child(n+4){display:none}
+  .sgrp+.sgrp .stat:nth-child(n+2){display:none}
   .minimap{display:none}
   .hint{display:none}
   .legend{display:none}
@@ -332,6 +336,8 @@ const TYPES = {
   assumption:{label:'Assumption',code:'ASM',v:'--t-assumption'},
   decision:{label:'Own call',code:'OWN',v:'--t-decision'}
 };
+const VLABEL={accepted:'used as-is',edited:'reshaped',overridden:'discarded',rejected:'discarded'};
+const vl=c=>VLABEL[c]||c;
 const CALLS = ['accepted','edited','overridden','rejected','pending','open','validated','invalidated','n/a'];
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -371,13 +377,16 @@ function renderStats(){
     exN:judged.filter(e=>e.kind==='execution').length, ex:pc(judged.filter(e=>e.kind==='execution'),'accepted'),
     juN:judged.filter(e=>e.kind==='judgement').length, ju:pc(judged.filter(e=>e.kind==='judgement'),'accepted')};
   const openA = S.entries.filter(e=>e.type==='assumption' && (e.call==='open'||e.call==='pending')).length;
-  $('stats').innerHTML = [
-    ['', c('ai')+c('tool'), 'AI touchpoints'],
-    ['', c('tool'), 'Tools built'],
-    ['ovr', c('override'), 'Overrides'],
-    ['', c('assumption'), openA ? `Assumptions · ${openA} open` : 'Assumptions'],
-    ['', judged.length ? asIs+'%' : '–', `Accepted as-is · ${S.split.ed}% edited · ${S.split.ov}% overridden`]
-  ].map(([cls,n,l])=>`<div class="stat ${cls}"><b>${n}</b><span>${l}</span></div>`).join('');
+  const st=(cls,n,l)=>`<div class="stat ${cls}"><b>${n}</b><span>${l}</span></div>`;
+  $('stats').innerHTML =
+    `<div class="sgrp"><span class="sgl">What AI produced</span><div class="sgr">`+
+      st('', c('ai')+c('tool'), `AI outputs · ${c('tool')} of them tools`)+
+      st('', judged.length ? asIs+'%' : '–', `Used as-is · ${S.split.ed}% reshaped · ${S.split.ov}% discarded`)+
+    `</div></div><div class="sgrp"><span class="sgl">What I did</span><div class="sgr">`+
+      st('ovr', c('override'), 'Overrides: I changed direction')+
+      st('', c('decision'), 'Own calls')+
+      st('', c('assumption'), 'Assumptions stated')+
+    `</div></div>`;
   $('chips').innerHTML = Object.entries(TYPES).map(([k,t])=>
     `<button class="chip${S.types.size===Object.keys(TYPES).length?' neutral':''}" data-t="${k}" aria-pressed="${S.types.has(k)}" title="Show only ${t.label}; click more types to add them" style="--c:var(${t.v})"><i></i>${t.label}<span class="n">${c(k)}</span></button>`).join('');
   const filtered = S.types.size!==Object.keys(TYPES).length || S.star || !!S.q;
@@ -404,7 +413,7 @@ function stripHTML(e){
       <div class="title">${esc(e.step||'(untitled)')}</div>
       ${e.aiDid?`<div class="what">${esc(e.aiDid)}</div>`:''}
       ${showWhy?`<div class="why">${esc(e.why)}</div>`:''}
-      <div class="meta"><span class="who ${who.toLowerCase()==='shashwat'?'human':''}">${esc(who)}</span>${e.call&&e.call!=='n/a'?`<span class="pill ${esc(e.call)}">${esc(e.call)}</span>`:''}${e.tool?`<span>${esc(e.tool)}</span>`:''}<span>${esc(fmtTs(e.ts))}</span>${linkChips(e)}${e.deckWorthy?'<span class="star" title="Highlight">★</span>':''}</div>
+      <div class="meta"><span class="who ${who.toLowerCase()==='shashwat'?'human':''}">${esc(who)}</span>${e.call&&e.call!=='n/a'?`<span class="pill ${esc(e.call)}">${esc(vl(e.call))}</span>`:''}${e.tool?`<span>${esc(e.tool)}</span>`:''}<span>${esc(fmtTs(e.ts))}</span>${linkChips(e)}${e.deckWorthy?'<span class="star" title="Highlight">★</span>':''}</div>
     </div></button>`;
 }
 function renderCanvas(){
@@ -616,7 +625,7 @@ function renderList(){
       <td><div class="clip"><b>${esc(e.step)}</b></div></td>
       <td><div class="clip">${esc(e.aiDid)}</div></td>
       <td class="n">${esc(e.tool)}</td><td class="n">${esc(e.author||'Claude')}</td>
-      <td>${e.call&&e.call!=='n/a'?`<span class="pill ${esc(e.call)}">${esc(e.call)}</span>`:''}</td>
+      <td>${e.call&&e.call!=='n/a'?`<span class="pill ${esc(e.call)}">${esc(vl(e.call))}</span>`:''}</td>
       <td><div class="clip">${esc(e.why)}</div></td><td>${e.deckWorthy?'★':''}</td></tr>`;}).join('')
   }</tbody></table>` : '<p style="color:var(--muted)">No entries match these filters.</p>';
 }
@@ -693,7 +702,7 @@ function renderSummary(){
     <div class="sum-intro">
       <h2>How AI was used on this case, stage by stage</h2>
       <p>Expand a stage to see what AI did, what I decided and the entries worth reading first (★). Canvas and List show all ${all.length} entries.</p>
-      ${S.split&&S.split.n?`<p class="sum-pattern"><b>The pattern:</b> of ${S.split.n} AI outputs, ${S.split.exN} were execution (tools, data, checks) and ${S.split.ex}% were used as-is; ${S.split.juN} were judgement calls (drafts, framing, copy) and only ${S.split.ju}% were used as-is. The rest I edited or overrode. <span>Verdicts assigned at the end of the work from what happened next.</span></p>`:''}
+      ${S.split&&S.split.n?`<p class="sum-pattern"><b>The pattern:</b> of the ${S.split.n} AI outputs that could be judged, ${S.split.exN} were execution (tools, data, checks) and ${S.split.ex}% were used as-is; ${S.split.juN} were judgement calls (drafts, framing, copy) and only ${S.split.ju}% were used as-is. The rest I reshaped or discarded. <span>Verdicts assigned at the end of the work from what happened next.</span></p>`:''}
     </div>
     <div style="display:flex;flex-direction:column;gap:12px">
       <div class="sum-bar"><div class="sum-tabs" role="group" aria-label="Group the summary by"><button data-by="stage" aria-pressed="${S.sumBy==='stage'}">By stage</button><button data-by="type" aria-pressed="${S.sumBy==='type'}">By category</button><button data-by="hl" aria-pressed="${S.sumBy==='hl'}">★ Highlights</button></div>
@@ -732,7 +741,7 @@ function openDetail(id){
     ${field(e.type==='tool'?'What the tool does':e.type==='assumption'?'Assumption':e.type==='override'?'What I changed':'What AI did', linkify(e.aiDid))}
     ${field('Why', linkify(e.why), 'why')}
     <div class="row2">${field('Tool', esc(e.tool))}${field('Logged by', esc(e.author||'Claude'))}</div>
-    <div class="row2">${field('My call', e.call&&e.call!=='n/a'?`<span class="pill ${esc(e.call)}">${esc(e.call)}</span>`:'')}${field('When', esc(fmtTs(e.ts)))}</div>
+    <div class="row2">${field('Verdict', e.call&&e.call!=='n/a'?`<span class="pill ${esc(e.call)}">${esc(vl(e.call))}</span>`:'')}${field('When', esc(fmtTs(e.ts)))}</div>
     ${field('Kind of work', e.kind==='execution'?'Execution (tools, data, checks)':e.kind==='judgement'?'Judgement (drafts, framing, copy)':'')}
     ${field('Note at the time', linkify(e.callNote))}
     ${field('Prompt / input', linkify(e.prompt))}
@@ -841,7 +850,7 @@ function toast(m){ const t=$('toast'); t.textContent=m; t.hidden=false; clearTim
 function exportData(fmt){
   const rows=sorted(), st=new Map(stagesList().map(s=>[s.n,s.name]));
   const cols=['#','stage','stageName','type','step','aiDid','why','tool','author','call','kind','callNote','ts','toolStack','toolOutput','codeLink','toolRef','relatesTo','prompt','output','evidence','deckWorthy'];
-  const val=(e,c)=> c==='#'?numById.get(e.id) : c==='stageName'?st.get(Number(e.stage)||0) : c==='toolRef'||c==='relatesTo' ? (e[c]?numById.get(e[c]):'') : e[c];
+  const val=(e,c)=> c==='#'?numById.get(e.id) : c==='stageName'?st.get(Number(e.stage)||0) : c==='toolRef'||c==='relatesTo' ? (e[c]?numById.get(e[c]):'') : c==='call' ? vl(e[c]) : e[c];
   if(fmt==='csv'){
     const q=v=>{v=v==null?'':String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
     return cols.join(',')+'\n'+rows.map(e=>cols.map(c=>q(val(e,c))).join(',')).join('\n');
