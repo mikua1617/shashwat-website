@@ -8,13 +8,13 @@ const nextConfig = {
   },
   async rewrites() {
     return [
-      { source: '/thoughtworks-log', destination: '/thoughtworks-log/index.html' },
+      { source: '/ai-first-working-log', destination: '/ai-first-working-log/index.html' },
     ]
   },
   async headers() {
     return [
-      { source: '/thoughtworks-log/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
-      { source: '/thoughtworks-log', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
+      { source: '/ai-first-working-log/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
+      { source: '/ai-first-working-log', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
     ]
   },
 }
