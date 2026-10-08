@@ -375,6 +375,7 @@ function renderStats(){
   S.split = {n:judged.length, acc:asIs, ed:pc(judged,'edited'), ov:pc(judged,'overridden')+pc(judged,'rejected'),
     exN:judged.filter(e=>e.kind==='execution').length, ex:pc(judged.filter(e=>e.kind==='execution'),'accepted'),
     juN:judged.filter(e=>e.kind==='judgement').length, ju:pc(judged.filter(e=>e.kind==='judgement'),'accepted')};
+  { const ju=judged.filter(e=>e.kind==='judgement'); S.split.tot=c('ai')+c('tool'); S.split.juEd=ju.filter(e=>e.call==='edited').length; S.split.juOv=ju.filter(e=>e.call==='overridden'||e.call==='rejected').length; S.split.exEd=judged.filter(e=>e.kind==='execution'&&e.call==='edited').length; S.split.ovr=c('override'); S.split.exOv=judged.filter(e=>e.kind==='execution'&&(e.call==='overridden'||e.call==='rejected')).length; }
   const openA = S.entries.filter(e=>e.type==='assumption' && (e.call==='open'||e.call==='pending')).length;
   const st=(cls,n,l)=>`<div class="stat ${cls}"><b>${n}</b><span>${l}</span></div>`;
   $('stats').innerHTML =
@@ -701,7 +702,7 @@ function renderSummary(){
     <div class="sum-intro">
       <h2>How AI was used on this case, stage by stage</h2>
       <p>Expand a stage to see what AI did, what I decided and the entries worth reading first (★). Canvas and List show all ${all.length} entries.</p>
-      ${S.split&&S.split.n?`<p class="sum-pattern"><b>The pattern:</b> of the ${S.split.n} AI outputs that could be judged, ${S.split.exN} were execution (tools, data, checks) and ${S.split.ex}% were used as-is; ${S.split.juN} were judgement calls (drafts, framing, copy) and only ${S.split.ju}% were used as-is. The rest I reshaped or discarded. <span>Verdicts assigned at the end of the work from what happened next.</span></p>`:''}
+      ${S.split&&S.split.n?`<p class="sum-pattern"><b>The pattern:</b> of ${S.split.tot} AI outputs, ${S.split.n} had a clear outcome (the other ${S.split.tot-S.split.n} were notes or fixes with nothing to judge). ${S.split.exN} were execution (tools, data, checks): ${S.split.ex}% used as-is, ${S.split.exEd} reshaped, ${S.split.exOv?S.split.exOv+' discarded':'none discarded'}. ${S.split.juN} were judgement calls (drafts, framing, copy): only ${S.split.ju}% used as-is, ${S.split.juEd} reshaped, ${S.split.juOv} discarded. Separately, the ${S.split.ovr} overrides are the times I changed direction, mostly on plans and premises rather than on a single AI output. <span>Verdicts assigned at the end of the work from what happened next.</span></p>`:''}
     </div>
     <div style="display:flex;flex-direction:column;gap:12px">
       <div class="sum-bar"><div class="sum-tabs" role="group" aria-label="Group the summary by"><button data-by="stage" aria-pressed="${S.sumBy==='stage'}">By stage</button><button data-by="type" aria-pressed="${S.sumBy==='type'}">By category</button><button data-by="hl" aria-pressed="${S.sumBy==='hl'}">★ Highlights</button></div>
