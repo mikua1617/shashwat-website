@@ -37,6 +37,22 @@ export const metadata: Metadata = {
     description:
       "A GTM strategist who ships marketing fast - and builds the systems that keep it running.",
     type: "website",
+    url: "https://www.heyshashwat.com",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Shashwat Mishra - GTM & Product Marketing Leader",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Shashwat Mishra - GTM & Product Marketing Leader",
+    description:
+      "A GTM strategist who ships marketing fast - and builds the systems that keep it running.",
+    images: ["/og-image.png"],
   },
 }
 
