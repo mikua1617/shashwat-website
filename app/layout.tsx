@@ -20,7 +20,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Shashwat Mishra - Product Marketer Who Builds",
   description:
-    "Shashwat Mishra is a product marketer who builds the automation and technical systems most PMMs only ask for.",
+    "Shashwat Mishra runs GTM like a marketer and ships it like an engineer - positioning, demand gen, and the automation behind both.",
   keywords: [
     "Shashwat Mishra",
     "Product Marketing",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Shashwat Mishra - Product Marketer Who Builds",
     description:
-      "A marketer who builds real automation and technical systems, not just campaigns.",
+      "A product marketer who ships GTM fast - and builds the systems that keep it running.",
     type: "website",
   },
 }

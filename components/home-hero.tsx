@@ -18,7 +18,7 @@ export function HomeHero() {
 
         <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-forest/90 sm:text-lg">
           <span className="cursor-blink">
-            Product marketer who builds the automation most PMMs only ask for
+            I run GTM like a marketer, ship it like an engineer.
           </span>
         </p>
 
