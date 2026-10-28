@@ -3,7 +3,7 @@ import { SiteFooter } from "@/components/site-footer"
 import { HomeHero } from "@/components/home-hero"
 import { ProjectCard } from "@/components/project-card"
 import { Panel } from "@/components/panel"
-import { AvatarReveal } from "@/components/avatar-reveal"
+import { Avatar } from "@/components/avatar"
 import { projects } from "@/lib/projects"
 
 export default function HomePage() {
@@ -18,7 +18,7 @@ export default function HomePage() {
         <Panel className="p-6 sm:p-10">
           <h2 className="heading text-[0.85rem] sm:text-base">// ABOUT</h2>
           <div className="mt-6 flex flex-col items-center gap-8 sm:flex-row sm:items-start">
-            <AvatarReveal />
+            <Avatar />
             <div className="space-y-4 text-sm leading-relaxed text-forest/90 sm:text-base">
               <p>
                 I&apos;m a product marketer who builds. Six-plus years running GTM,
