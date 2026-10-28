@@ -18,11 +18,12 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Shashwat Mishra - Product Marketing Leader",
+  title: "Shashwat Mishra - GTM & Product Marketing Leader",
   description:
-    "Shashwat Mishra runs GTM like a marketer and ships it like an engineer - positioning, demand gen, and the automation behind both.",
+    "Shashwat Mishra runs GTM strategy like a marketer and ships it like an engineer - positioning, demand gen, and the automation behind both.",
   keywords: [
     "Shashwat Mishra",
+    "GTM Strategy",
     "Product Marketing",
     "PMM",
     "AI",
@@ -32,9 +33,9 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Shashwat Mishra" }],
   openGraph: {
-    title: "Shashwat Mishra - Product Marketing Leader",
+    title: "Shashwat Mishra - GTM & Product Marketing Leader",
     description:
-      "A product marketer who ships GTM fast - and builds the systems that keep it running.",
+      "A GTM strategist who ships marketing fast - and builds the systems that keep it running.",
     type: "website",
   },
 }

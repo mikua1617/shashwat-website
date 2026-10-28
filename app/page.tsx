@@ -21,8 +21,8 @@ export default function HomePage() {
             <Avatar />
             <div className="space-y-4 text-sm leading-relaxed text-forest/90 sm:text-base">
               <p>
-                I&apos;m a product marketer who builds. Six-plus years running GTM,
-                demand gen, and positioning across BFSI, enterprise IT, and AI/SaaS,
+                I&apos;m a GTM strategist who builds. Six-plus years leading
+                go-to-market, demand gen, and positioning across BFSI, enterprise IT, and AI/SaaS,
                 and most of what I build lives just behind the words: pipelines
                 that pull the right signal on a prospect before an email goes
                 out, agents that watch a competitor&apos;s site for what changed,
@@ -36,10 +36,11 @@ export default function HomePage() {
                 role since: shipping beats theorizing.
               </p>
               <p>
-                Today I do product marketing at a BFSI-focused AI startup, where
-                that instinct shows up as personalization pipelines, fine-tuned
-                models, and research agents. The positioning is simple: a marketer
-                who ships real automation, not just campaigns.
+                Today I lead GTM strategy and product marketing at a BFSI-focused
+                AI startup, where that instinct shows up as personalization
+                pipelines, fine-tuned models, and research agents. The positioning
+                is simple: a GTM strategist who ships real automation, not just
+                campaigns.
               </p>
             </div>
           </div>
