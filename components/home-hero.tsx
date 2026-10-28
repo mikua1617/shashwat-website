@@ -7,7 +7,7 @@ export function HomeHero() {
     <section className="mx-auto max-w-5xl px-4 pt-12 sm:px-6">
       <Panel className="p-6 text-center sm:p-12">
         <p className="text-xs uppercase tracking-[0.3em] text-forest/70">
-          {"// gtm strategy × building"}
+          {"// gtm strategy × product marketing"}
         </p>
 
         <h1 className="heading mx-auto mt-6 text-2xl leading-relaxed sm:text-4xl sm:leading-relaxed">
